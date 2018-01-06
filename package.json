@@ -1,0 +1,19 @@
+{
+  "name": "promises-blog",
+  "version": "1.0.0",
+  "description": "Demo code for talking about promises",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jessitron/promises-blog.git"
+  },
+  "author": "jessitron",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jessitron/promises-blog/issues"
+  },
+  "homepage": "https://github.com/jessitron/promises-blog#readme"
+}
