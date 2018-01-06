@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import { promisify } from "util";
 
 console.log("Hello");
 
@@ -14,6 +13,24 @@ recommendations.forEach(rec =>
 
 
 /********************************/
+
+
+interface DeletionCriteria {
+    tooFewCommits: number;
+    suspiciousPrefix: string;
+}
+
+function readConfig(): DeletionCriteria {
+    /* {
+        tooFewCommits: 1,
+        suspiciousPrefix: "test-repo",
+    } */
+    const configFileContent = fs.readFileSync(
+        "config/deletionCriteria.json",
+        { encoding: "utf8" });
+    const parsed = JSON.parse(configFileContent);
+    return parsed;
+}
 
 interface RepoData {
     name: string;
@@ -50,19 +67,3 @@ function constructReport(criteria, input) {
     return singleCommitRepos.map(r => "I recommend deleting " + r.name);
 }
 
-interface DeletionCriteria {
-    tooFewCommits: number;
-    suspiciousPrefix: string;
-}
-
-function readConfig(): DeletionCriteria {
-    /* {
-        tooFewCommits: 1,
-        suspiciousPrefix: "test-repo",
-    } */
-    const configFileContent = fs.readFileSync(
-        "config/deletionCriteria.json",
-        { encoding: "utf8" });
-    const parsed = JSON.parse(configFileContent);
-    return parsed;
-}
