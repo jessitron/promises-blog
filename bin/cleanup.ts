@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import { promisify } from "util";
 
 console.log("Hello");
 
@@ -20,15 +21,17 @@ interface DeletionCriteria {
     suspiciousPrefix: string;
 }
 
-function readConfig(): DeletionCriteria {
+function readConfig(): Promise<DeletionCriteria> {
     /* {
         tooFewCommits: 1,
         suspiciousPrefix: "test-repo",
     } */
-    const configFileContent: string = fs.readFileSync(
+    const configFileContentPromise: Promise<string> = promisify(fs.readFile)(
         "config/deletionCriteria.json",
         { encoding: "utf8" });
-    const parsed: DeletionCriteria = JSON.parse(configFileContent);
+    const parsed: Promise<DeletionCriteria> = configFileContentPromise.then(
+        configFileContent =>
+            JSON.parse(configFileContent));
     return parsed;
 }
 
