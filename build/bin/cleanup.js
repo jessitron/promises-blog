@@ -1,10 +1,9 @@
 "use strict";
 console.log("Hello");
 const data = gatherData();
-const criteria = readConfig();
-const recommendations = constructReport(criteria, data);
+const config = readConfig();
+const recommendations = constructReport(config, data);
 recommendations.forEach(rec => console.log(rec));
-/********************************/
 function gatherData() {
     return [
         {
@@ -31,6 +30,9 @@ function constructReport(criteria, input) {
     return singleCommitRepos.map(r => "I recommend deleting " + r.name);
 }
 function readConfig() {
-    return { tooFewCommits: 1, suspiciousPrefix: "test-repo" };
+    return {
+        tooFewCommits: 1,
+        suspiciousPrefix: "test-repo",
+    };
 }
 //# sourceMappingURL=cleanup.js.map

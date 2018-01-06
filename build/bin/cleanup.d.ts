@@ -1,19 +1,15 @@
-declare const data: {
-    name: string;
-    commits: number;
-}[];
-declare const criteria: {
-    tooFewCommits: number;
-    suspiciousPrefix: string;
-};
-declare const recommendations: any;
+declare const data: RepoData[];
+declare const config: DeletionCriteria;
+declare const recommendations: string[];
 /********************************/
-declare function gatherData(): {
+interface RepoData {
     name: string;
     commits: number;
-}[];
+}
+declare function gatherData(): RepoData[];
 declare function constructReport(criteria: any, input: any): any;
-declare function readConfig(): {
+interface DeletionCriteria {
     tooFewCommits: number;
     suspiciousPrefix: string;
-};
+}
+declare function readConfig(): DeletionCriteria;

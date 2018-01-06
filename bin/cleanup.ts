@@ -1,10 +1,10 @@
 console.log("Hello");
 
-const data = gatherData();
+const data: RepoData[] = gatherData();
 
-const config = readConfig();
+const config: DeletionCriteria = readConfig();
 
-const recommendations = constructReport(config, data);
+const recommendations: string[] = constructReport(config, data);
 
 recommendations.forEach(rec =>
     console.log(rec));
@@ -12,7 +12,12 @@ recommendations.forEach(rec =>
 
 /********************************/
 
-function gatherData() {
+interface RepoData {
+    name: string;
+    commits: number;
+}
+
+function gatherData(): RepoData[] {
     return [
         {
             name: "test-repo-1",
@@ -39,8 +44,12 @@ function constructReport(criteria, input) {
     return singleCommitRepos.map(r => "I recommend deleting " + r.name);
 }
 
+interface DeletionCriteria {
+    tooFewCommits: number;
+    suspiciousPrefix: string;
+}
 
-function readConfig() {
+function readConfig(): DeletionCriteria {
     return {
         tooFewCommits: 1,
         suspiciousPrefix: "test-repo",
