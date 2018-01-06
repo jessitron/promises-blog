@@ -1,8 +1,11 @@
+import * as fs from "fs";
+import { promisify } from "util";
+
 console.log("Hello");
 
-const data: RepoData[] = gatherData();
-
 const config: DeletionCriteria = readConfig();
+
+const data: RepoData[] = gatherData();
 
 const recommendations: string[] = constructReport(config, data);
 
@@ -18,23 +21,26 @@ interface RepoData {
 }
 
 function gatherData(): RepoData[] {
-    return [
-        {
-            name: "test-repo-1",
-            commits: 1,
-        },
-        {
-            name: "promises-blog",
-            commits: 4,
-        },
-        {
-            name: "abandoned-project",
-            commits: 1,
-        },
-        {
-            name: "test-repo-2",
-            commits: 2,
-        }];
+    const repositoryNames = ["test-repo-1", "promises-blog", "abandoned-project", "test-repo-2"];
+
+    function commitCount(repositoryName: string): number {
+        return ({
+            "test-repo-1": 1,
+            "promises-blog": 4,
+            "abandoned-project": 1,
+            "test-repo-2": 2,
+        })[repositoryName];
+    }
+
+    const repositoryData = repositoryNames.map(repositoryName => {
+        const numberOfCommits = commitCount(repositoryName);
+        return {
+            name: repositoryName,
+            commits: numberOfCommits,
+        };
+    });
+
+    return repositoryData;
 }
 
 function constructReport(criteria, input) {
@@ -50,8 +56,13 @@ interface DeletionCriteria {
 }
 
 function readConfig(): DeletionCriteria {
-    return {
+    /* {
         tooFewCommits: 1,
         suspiciousPrefix: "test-repo",
-    };
+    } */
+    const configFileContent = fs.readFileSync(
+        "config/deletionCriteria.json",
+        { encoding: "utf8" });
+    const parsed = JSON.parse(configFileContent);
+    return parsed;
 }
