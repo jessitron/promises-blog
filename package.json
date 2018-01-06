@@ -12,6 +12,9 @@
   },
   "author": "jessitron",
   "license": "ISC",
+  "dependencies": {
+    "axios": "^0.17.1"
+  },
   "bugs": {
     "url": "https://github.com/jessitron/promises-blog/issues"
   },
