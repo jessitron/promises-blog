@@ -3,14 +3,15 @@ import { promisify } from "util";
 
 console.log("Hello");
 
-const config: DeletionCriteria = readConfig();
+const config: Promise<DeletionCriteria> = readConfig();
 
 const data: RepoData[] = gatherData();
 
-const recommendations: string[] = constructReport(config, data);
+const recommendationsPromise: Promise<string[]> = constructReport(config, data);
 
+recommendationsPromise.then(recommendations =>
 recommendations.forEach(rec =>
-    console.log(rec));
+    console.log(rec)));
 
 
 /********************************/
@@ -26,13 +27,11 @@ function readConfig(): Promise<DeletionCriteria> {
         tooFewCommits: 1,
         suspiciousPrefix: "test-repo",
     } */
-    const configFileContentPromise: Promise<string> = promisify(fs.readFile)(
+    return promisify(fs.readFile)(
         "config/deletionCriteria.json",
-        { encoding: "utf8" });
-    const parsed: Promise<DeletionCriteria> = configFileContentPromise.then(
-        configFileContent =>
+        { encoding: "utf8" })
+        .then(configFileContent =>
             JSON.parse(configFileContent));
-    return parsed;
 }
 
 interface RepoData {
@@ -63,10 +62,12 @@ function gatherData(): RepoData[] {
     return repositoryData;
 }
 
-function constructReport(criteria, input) {
-    const singleCommitRepos = input.filter(r =>
-        (r.commits <= criteria.tooFewCommits) ||
-        (r.name.startsWith(criteria.suspiciousPrefix)));
-    return singleCommitRepos.map(r => "I recommend deleting " + r.name);
+function constructReport(criteriaPromise: Promise<DeletionCriteria>, input: RepoData[]): Promise<string[]> {
+    return criteriaPromise.then(criteria => {
+        const singleCommitRepos = input.filter(r =>
+            (r.commits <= criteria.tooFewCommits) ||
+            (r.name.startsWith(criteria.suspiciousPrefix)));
+        return singleCommitRepos.map(r => "I recommend deleting " + r.name);
+    });
 }
 

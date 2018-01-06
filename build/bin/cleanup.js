@@ -1,11 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
+const util_1 = require("util");
 console.log("Hello");
 const config = readConfig();
 const data = gatherData();
-const recommendations = constructReport(config, data);
-recommendations.forEach(rec => console.log(rec));
+const recommendationsPromise = constructReport(config, data);
+recommendationsPromise.then(recommendations => recommendations.forEach(rec => console.log(rec)));
+function readConfig() {
+    /* {
+        tooFewCommits: 1,
+        suspiciousPrefix: "test-repo",
+    } */
+    return util_1.promisify(fs.readFile)("config/deletionCriteria.json", { encoding: "utf8" })
+        .then(configFileContent => JSON.parse(configFileContent));
+}
 function gatherData() {
     const repositoryNames = ["test-repo-1", "promises-blog", "abandoned-project", "test-repo-2"];
     function commitCount(repositoryName) {
@@ -25,18 +34,11 @@ function gatherData() {
     });
     return repositoryData;
 }
-function constructReport(criteria, input) {
-    const singleCommitRepos = input.filter(r => (r.commits <= criteria.tooFewCommits) ||
-        (r.name.startsWith(criteria.suspiciousPrefix)));
-    return singleCommitRepos.map(r => "I recommend deleting " + r.name);
-}
-function readConfig() {
-    /* {
-        tooFewCommits: 1,
-        suspiciousPrefix: "test-repo",
-    } */
-    const configFileContent = fs.readFileSync("config/deletionCriteria.json", { encoding: "utf8" });
-    const parsed = JSON.parse(configFileContent);
-    return parsed;
+function constructReport(criteriaPromise, input) {
+    return criteriaPromise.then(criteria => {
+        const singleCommitRepos = input.filter(r => (r.commits <= criteria.tooFewCommits) ||
+            (r.name.startsWith(criteria.suspiciousPrefix)));
+        return singleCommitRepos.map(r => "I recommend deleting " + r.name);
+    });
 }
 //# sourceMappingURL=cleanup.js.map
