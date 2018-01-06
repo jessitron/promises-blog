@@ -25,10 +25,10 @@ function readConfig(): DeletionCriteria {
         tooFewCommits: 1,
         suspiciousPrefix: "test-repo",
     } */
-    const configFileContent = fs.readFileSync(
+    const configFileContent: string = fs.readFileSync(
         "config/deletionCriteria.json",
         { encoding: "utf8" });
-    const parsed = JSON.parse(configFileContent);
+    const parsed: DeletionCriteria = JSON.parse(configFileContent);
     return parsed;
 }
 
