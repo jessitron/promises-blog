@@ -24,10 +24,6 @@ interface DeletionCriteria {
 }
 
 function readConfig(): DeletionCriteria {
-    /* {
-        tooFewCommits: 1,
-        suspiciousPrefix: "test-repo",
-    } */
     const content = fs.readFileSync(
         "config/deletionCriteria.json",
         { encoding: "utf8" });
