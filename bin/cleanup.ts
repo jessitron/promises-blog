@@ -26,10 +26,6 @@ interface DeletionCriteria {
 }
 
 async function readConfig(): Promise<DeletionCriteria> {
-    /* {
-        tooFewCommits: 1,
-        suspiciousPrefix: "test-repo",
-    } */
     const content = await promisify(fs.readFile)(
         "config/deletionCriteria.json",
         { encoding: "utf8" });
