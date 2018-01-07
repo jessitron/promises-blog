@@ -5,6 +5,7 @@ if (!GitHubToken) {
     console.log("BEWARE: This won't work without a token");
 }
 const AuthHeader = { Authorization: "token " + GitHubToken };
+const Owner = "jessitron"; // could retrieve this from the github API but it's valid for me to hard-code it
 
 export interface UsefulRepoData {
     commits_url: string;
@@ -37,4 +38,15 @@ export function gatherCommitCount(repository: UsefulRepoData): Promise<UsefulRep
             return Promise.reject(err);
         }
     });
+}
+
+export function actuallyDelete(repoName: string): Promise<void> {
+    return axios.delete("https://api.github.com/repos/" + Owner + "/" + repoName, { headers: AuthHeader})
+        .then(() => console.log("Deleted " + repoName), err => {
+            if (err.response && (err.response.status === 403)) {
+                console.log("FYI: you are not authorized to delete " + repoName);
+            } else {
+                return Promise.reject(err);
+            }
+        });
 }
