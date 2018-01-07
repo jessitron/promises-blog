@@ -36,13 +36,14 @@ function gatherData() {
             commits: numberOfCommits,
         };
     });
-    return repositoryData;
+    return Promise.resolve(repositoryData);
 }
-function constructReport(criteriaPromise, input) {
-    return criteriaPromise.then(criteria => {
+function constructReport(criteriaPromise, inputPromise) {
+    return criteriaPromise.then(criteria => inputPromise
+        .then(input => {
         const singleCommitRepos = input.filter(r => (r.commits <= criteria.tooFewCommits) ||
             (r.name.startsWith(criteria.suspiciousPrefix)));
         return singleCommitRepos.map(r => "I recommend deleting " + r.name);
-    });
+    }));
 }
 //# sourceMappingURL=cleanup.js.map

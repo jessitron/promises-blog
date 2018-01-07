@@ -5,7 +5,7 @@ console.log("Hello");
 
 const config: Promise<DeletionCriteria> = readConfig();
 
-const data: RepoData[] = gatherData();
+const data: Promise<RepoData[]> = gatherData();
 
 const report: Promise<string[]> = constructReport(config, data);
 
@@ -16,8 +16,8 @@ makeRecommendations(report);
 
 function makeRecommendations(recommendationsPromise: Promise<string[]>): Promise<void> {
     return recommendationsPromise.then(recommendations =>
-            recommendations.forEach(rec =>
-                console.log(rec)));
+        recommendations.forEach(rec =>
+            console.log(rec)));
 }
 
 interface DeletionCriteria {
@@ -42,7 +42,7 @@ interface RepoData {
     commits: number;
 }
 
-function gatherData(): RepoData[] {
+function gatherData(): Promise<RepoData[]> {
     const repositoryNames = ["test-repo-1", "promises-blog", "abandoned-project", "test-repo-2"];
 
     function commitCount(repositoryName: string): number {
@@ -62,15 +62,16 @@ function gatherData(): RepoData[] {
         };
     });
 
-    return repositoryData;
+    return Promise.resolve(repositoryData);
 }
 
-function constructReport(criteriaPromise: Promise<DeletionCriteria>, input: RepoData[]): Promise<string[]> {
-    return criteriaPromise.then(criteria => {
-        const singleCommitRepos = input.filter(r =>
-            (r.commits <= criteria.tooFewCommits) ||
-            (r.name.startsWith(criteria.suspiciousPrefix)));
-        return singleCommitRepos.map(r => "I recommend deleting " + r.name);
-    });
+function constructReport(criteriaPromise: Promise<DeletionCriteria>, inputPromise: Promise<RepoData[]>): Promise<string[]> {
+    return criteriaPromise.then(criteria => inputPromise
+        .then(input => {
+            const singleCommitRepos = input.filter(r =>
+                (r.commits <= criteria.tooFewCommits) ||
+                (r.name.startsWith(criteria.suspiciousPrefix)));
+            return singleCommitRepos.map(r => "I recommend deleting " + r.name);
+        }));
 }
 
