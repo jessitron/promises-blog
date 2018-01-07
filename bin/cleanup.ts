@@ -28,10 +28,10 @@ function readConfig(): DeletionCriteria {
         tooFewCommits: 1,
         suspiciousPrefix: "test-repo",
     } */
-    const configFileContent = fs.readFileSync(
+    const content = fs.readFileSync(
         "config/deletionCriteria.json",
-        { encoding: "utf8" })
-    return JSON.parse(configFileContent);
+        { encoding: "utf8" });
+    return JSON.parse(content);
 }
 
 interface RepoData {
