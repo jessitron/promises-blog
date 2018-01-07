@@ -1,23 +1,21 @@
 import * as fs from "fs";
-import { promisify } from "util";
 
 console.log("Hello");
 
-const config: Promise<DeletionCriteria> = readConfig();
+const config: DeletionCriteria = readConfig();
 
-const data: Promise<RepoData[]> = gatherData();
+const data: RepoData[] = gatherData();
 
-const report: Promise<string[]> = constructReport(config, data);
+const report: string[] = constructReport(config, data);
 
 makeRecommendations(report);
 
 
 /********************************/
 
-function makeRecommendations(recommendationsPromise: Promise<string[]>): Promise<void> {
-    return recommendationsPromise.then(recommendations =>
-        recommendations.forEach(rec =>
-            console.log(rec)));
+function makeRecommendations(recommendations: string[]) {
+    recommendations.forEach(rec =>
+        console.log(rec));
 }
 
 interface DeletionCriteria {
@@ -25,16 +23,15 @@ interface DeletionCriteria {
     suspiciousPrefix: string;
 }
 
-function readConfig(): Promise<DeletionCriteria> {
+function readConfig(): DeletionCriteria {
     /* {
         tooFewCommits: 1,
         suspiciousPrefix: "test-repo",
     } */
-    return promisify(fs.readFile)(
+    const configFileContent = fs.readFileSync(
         "config/deletionCriteria.json",
         { encoding: "utf8" })
-        .then(configFileContent =>
-            JSON.parse(configFileContent));
+    return JSON.parse(configFileContent);
 }
 
 interface RepoData {
@@ -42,7 +39,7 @@ interface RepoData {
     commits: number;
 }
 
-function gatherData(): Promise<RepoData[]> {
+function gatherData(): RepoData[] {
     const repositoryNames = ["test-repo-1", "promises-blog", "abandoned-project", "test-repo-2"];
 
     function commitCount(repositoryName: string): number {
@@ -62,16 +59,13 @@ function gatherData(): Promise<RepoData[]> {
         };
     });
 
-    return Promise.resolve(repositoryData);
+    return repositoryData;
 }
 
-function constructReport(criteriaPromise: Promise<DeletionCriteria>, inputPromise: Promise<RepoData[]>): Promise<string[]> {
-    return criteriaPromise.then(criteria => inputPromise
-        .then(input => {
-            const singleCommitRepos = input.filter(r =>
-                (r.commits <= criteria.tooFewCommits) ||
-                (r.name.startsWith(criteria.suspiciousPrefix)));
-            return singleCommitRepos.map(r => "I recommend deleting " + r.name);
-        }));
+function constructReport(criteria: DeletionCriteria, input: RepoData[]): string[] {
+    const singleCommitRepos = input.filter(r =>
+        (r.commits <= criteria.tooFewCommits) ||
+        (r.name.startsWith(criteria.suspiciousPrefix)));
+    return singleCommitRepos.map(r => "I recommend deleting " + r.name);
 }
 
