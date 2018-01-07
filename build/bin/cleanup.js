@@ -5,8 +5,12 @@ const util_1 = require("util");
 console.log("Hello");
 const config = readConfig();
 const data = gatherData();
-const recommendationsPromise = constructReport(config, data);
-recommendationsPromise.then(recommendations => recommendations.forEach(rec => console.log(rec)));
+const report = constructReport(config, data);
+makeRecommendations(report);
+/********************************/
+function makeRecommendations(recommendationsPromise) {
+    return recommendationsPromise.then(recommendations => recommendations.forEach(rec => console.log(rec)));
+}
 function readConfig() {
     /* {
         tooFewCommits: 1,

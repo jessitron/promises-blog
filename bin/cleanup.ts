@@ -7,15 +7,18 @@ const config: Promise<DeletionCriteria> = readConfig();
 
 const data: RepoData[] = gatherData();
 
-const recommendationsPromise: Promise<string[]> = constructReport(config, data);
+const report: Promise<string[]> = constructReport(config, data);
 
-recommendationsPromise.then(recommendations =>
-recommendations.forEach(rec =>
-    console.log(rec)));
+makeRecommendations(report);
 
 
 /********************************/
 
+function makeRecommendations(recommendationsPromise: Promise<string[]>): Promise<void> {
+    return recommendationsPromise.then(recommendations =>
+            recommendations.forEach(rec =>
+                console.log(rec)));
+}
 
 interface DeletionCriteria {
     tooFewCommits: number;
