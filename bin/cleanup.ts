@@ -25,16 +25,15 @@ interface DeletionCriteria {
     suspiciousPrefix: string;
 }
 
-function readConfig(): Promise<DeletionCriteria> {
+async function readConfig(): Promise<DeletionCriteria> {
     /* {
         tooFewCommits: 1,
         suspiciousPrefix: "test-repo",
     } */
-    return promisify(fs.readFile)(
+    const content = await promisify(fs.readFile)(
         "config/deletionCriteria.json",
-        { encoding: "utf8" })
-        .then(configFileContent =>
-            JSON.parse(configFileContent));
+        { encoding: "utf8" });
+    return JSON.parse(content);
 }
 
 interface RepoData {
