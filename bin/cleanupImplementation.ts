@@ -24,6 +24,6 @@ async function implementCleanup(instructionsFile: string) {
 }
 
 function repoToDelete(line: string) {
-    const match = line.match(/^Delete (\w+)/);
+    const match = line.match(/^Delete ([\w-_.]+)/);
     return match && match[1];
 }

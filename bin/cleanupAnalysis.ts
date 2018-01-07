@@ -29,6 +29,7 @@ async function makeRecommendations(reportPromise: Promise<Report>): Promise<void
 interface DeletionCriteria {
     tooFewCommits: number;
     suspiciousPrefix: string;
+    fork: boolean;
 }
 
 function readConfig(): Promise<DeletionCriteria> {
@@ -47,6 +48,7 @@ interface RepoData {
     name: string;
     commits: number;
     description: string;
+    fork: boolean;
 }
 
 async function gatherData(): Promise<RepoData[]> {
@@ -88,6 +90,9 @@ function evaluateOneRepo(criteria: DeletionCriteria, r: RepoData): Recommendatio
     }
     if (r.name.startsWith(criteria.suspiciousPrefix)) {
         deleteBecause("name starts with " + criteria.suspiciousPrefix);
+    }
+    if (criteria.fork && r.fork) {
+        deleteBecause("it is a fork");
     }
 
     return recommendations;

@@ -20,8 +20,8 @@ export interface NumberOfCommits {
     commits: number;
 }
 
-export function gatherMyRepositoryNames(pageSize: number = 10): Promise<UsefulRepoData[]> {
-    return axios.get("https://api.github.com/users/jessitron/repos?per_page=" + pageSize, { headers: AuthHeader })
+export function gatherMyRepositoryNames(pageSize: number = 100): Promise<UsefulRepoData[]> {
+    return axios.get("https://api.github.com/user/repos?affiliation=owner&per_page=" + pageSize, { headers: AuthHeader })
         .then(response => response.data as UsefulRepoData[]);
 }
 
@@ -45,6 +45,8 @@ export function actuallyDelete(repoName: string): Promise<void> {
         .then(() => console.log("Deleted " + repoName), err => {
             if (err.response && (err.response.status === 403)) {
                 console.log("FYI: you are not authorized to delete " + repoName);
+            } else if (err.response && (err.response.status === 404)) {
+                console.log("FYI: this one is already gone: " + repoName);
             } else {
                 return Promise.reject(err);
             }
