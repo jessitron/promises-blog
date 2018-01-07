@@ -15,7 +15,8 @@
   "author": "jessitron",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.17.1"
+    "axios": "^0.17.1",
+    "json-stringify-safe": "^5.0.1"
   },
   "devDependencies": {
     "typescript": "^2.6.2",

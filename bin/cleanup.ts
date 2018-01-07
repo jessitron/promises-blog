@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import { promisify } from "util";
+import { gatherMyRepositoryNames, gatherCommitCount } from "../src/githubCalls";
 
 console.log("Hello");
 
@@ -7,17 +8,22 @@ const config: Promise<DeletionCriteria> = readConfig();
 
 const data: Promise<RepoData[]> = gatherData();
 
-const report: Promise<string[]> = constructReport(config, data);
+const report: Promise<Report> = constructReport(config, data);
 
-makeRecommendations(report);
+makeRecommendations(report).catch(err => {
+    console.log("ERROR: " + err);
+});
 
 
 /********************************/
 
-function makeRecommendations(recommendationsPromise: Promise<string[]>): Promise<void> {
-    return recommendationsPromise.then(recommendations =>
-        recommendations.forEach(rec =>
-            console.log(rec)));
+async function makeRecommendations(reportPromise: Promise<Report>): Promise<void> {
+    const finalReport = await reportPromise;
+
+    console.log("Evaluated " + finalReport.repositoriesEvaluated.length + " repositories");
+
+    finalReport.suggestions.forEach(rec =>
+        console.log(rec));
 }
 
 interface DeletionCriteria {
@@ -40,38 +46,55 @@ function readConfig(): Promise<DeletionCriteria> {
 interface RepoData {
     name: string;
     commits: number;
+    description: string;
 }
 
-function gatherData(): Promise<RepoData[]> {
-    const repositoryNames = ["test-repo-1", "promises-blog", "abandoned-project", "test-repo-2"];
+async function gatherData(): Promise<RepoData[]> {
 
-    function commitCount(repositoryName: string): number {
-        return ({
-            "test-repo-1": 1,
-            "promises-blog": 4,
-            "abandoned-project": 1,
-            "test-repo-2": 2,
-        })[repositoryName];
+    const repositories = await gatherMyRepositoryNames();
+
+    const fullData = repositories.map(gatherCommitCount);
+
+    return Promise.all(fullData);
+}
+
+interface Report {
+    repositoriesEvaluated: RepoData[];
+    suggestions: string[];
+}
+
+async function constructReport(criteriaPromise: Promise<DeletionCriteria>, inputPromise: Promise<RepoData[]>): Promise<Report> {
+    const criteria = await criteriaPromise;
+    const input = await inputPromise;
+
+    const summaries = input.map(repo => summarizeRecommendations(repo, evaluateOneRepo(criteria, repo))).filter(s => !!s);
+    return { repositoriesEvaluated: input, suggestions: summaries };
+}
+
+interface Recommendation {
+    shouldDelete: boolean;
+    reason: string;
+}
+
+function evaluateOneRepo(criteria: DeletionCriteria, r: RepoData): Recommendation[] {
+    const recommendations: Recommendation[] = [];
+
+    function deleteBecause(reason: string) {
+        recommendations.push({ shouldDelete: true, reason });
     }
 
-    const repositoryData = repositoryNames.map(repositoryName => {
-        const numberOfCommits = commitCount(repositoryName);
-        return {
-            name: repositoryName,
-            commits: numberOfCommits,
-        };
-    });
+    if (r.commits <= criteria.tooFewCommits) {
+        deleteBecause("only " + r.commits + " commits");
+    }
+    if (r.name.startsWith(criteria.suspiciousPrefix)) {
+        deleteBecause("name starts with " + criteria.suspiciousPrefix);
+    }
 
-    return Promise.resolve(repositoryData);
+    return recommendations;
 }
 
-function constructReport(criteriaPromise: Promise<DeletionCriteria>, inputPromise: Promise<RepoData[]>): Promise<string[]> {
-    return criteriaPromise.then(criteria => inputPromise
-        .then(input => {
-            const singleCommitRepos = input.filter(r =>
-                (r.commits <= criteria.tooFewCommits) ||
-                (r.name.startsWith(criteria.suspiciousPrefix)));
-            return singleCommitRepos.map(r => "I recommend deleting " + r.name);
-        }));
+function summarizeRecommendations(repo: RepoData, recommendations: Recommendation[]) {
+    if (recommendations.filter(r => r.shouldDelete).length > 0) {
+        return `Delete ${repo.name} (${repo.description}) because ` + recommendations.map(r => r.reason).join(" and ");
+    }
 }
-
