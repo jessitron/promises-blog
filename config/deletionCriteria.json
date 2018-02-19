@@ -1,5 +1,10 @@
 {
-  "tooFewCommits": 1,
+  "tooFewCommits": 2,
   "suspiciousPrefix": "test-repo",
-  "fork": true
+  "fork": true,
+  "suspiciousDescriptions": [
+    "project created by Atomist",
+    "my new project"
+  ],
+  "descriptionSameAsNameIsSuspicious": true
 }

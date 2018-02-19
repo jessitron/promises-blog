@@ -30,6 +30,8 @@ interface DeletionCriteria {
     tooFewCommits: number;
     suspiciousPrefix: string;
     fork: boolean;
+    suspiciousDescriptions: string[];
+    descriptionSameAsNameIsSuspicious: boolean;
 }
 
 function readConfig(): Promise<DeletionCriteria> {
@@ -93,6 +95,12 @@ function evaluateOneRepo(criteria: DeletionCriteria, r: RepoData): Recommendatio
     }
     if (criteria.fork && r.fork) {
         deleteBecause("it is a fork");
+    }
+    if (criteria.suspiciousDescriptions.includes(r.description)) {
+        deleteBecause("the description is generic");
+    }
+    if (criteria.descriptionSameAsNameIsSuspicious && r.name === r.description) {
+        deleteBecause("the description is the same as the name");
     }
 
     return recommendations;

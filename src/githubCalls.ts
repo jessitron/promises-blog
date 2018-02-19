@@ -5,7 +5,8 @@ if (!GitHubToken) {
     console.log("BEWARE: This won't work without a token");
 }
 const AuthHeader = { Authorization: "token " + GitHubToken };
-const Owner = "jessitron"; // could retrieve this from the github API but it's valid for me to hard-code it
+// const Owner = "jessitron"; // could retrieve this from the github API but it's valid for me to hard-code it
+export const GitHubOrg = "spring-team";
 
 export interface UsefulRepoData {
     commits_url: string;
@@ -21,8 +22,13 @@ export interface NumberOfCommits {
 }
 
 export function gatherMyRepositoryNames(pageSize: number = 100): Promise<UsefulRepoData[]> {
-    return axios.get("https://api.github.com/user/repos?affiliation=owner&per_page=" + pageSize, { headers: AuthHeader })
-        .then(response => response.data as UsefulRepoData[]);
+   const url = `https://api.github.com/orgs/${GitHubOrg}/repos`;
+   return axios.get(url,
+        { headers: AuthHeader })
+        .then(response => response.data as UsefulRepoData[])
+        .catch(err => {
+            console.log(err.response.data);
+            throw new Error(`Failure fetching repos from ${url}\n` + err.message)});
 }
 
 export function gatherCommitCount(repository: UsefulRepoData): Promise<UsefulRepoData & NumberOfCommits> {
@@ -41,7 +47,7 @@ export function gatherCommitCount(repository: UsefulRepoData): Promise<UsefulRep
 }
 
 export function actuallyDelete(repoName: string): Promise<void> {
-    return axios.delete("https://api.github.com/repos/" + Owner + "/" + repoName, { headers: AuthHeader})
+    return axios.delete("https://api.github.com/repos/" + GitHubOrg + "/" + repoName, { headers: AuthHeader})
         .then(() => console.log("Deleted " + repoName), err => {
             if (err.response && (err.response.status === 403)) {
                 console.log("FYI: you are not authorized to delete " + repoName);

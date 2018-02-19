@@ -1,0 +1,26 @@
+Hello
+Evaluated 30 repositories
+Delete undefined (project created by Atomist) because only 2 commits and the description is generic
+Delete demo4 (project created by Atomist) because only 2 commits and the description is generic
+Delete demo5 (project created by Atomist) because only 2 commits and the description is generic
+Delete demo7 (project created by Atomist) because the description is generic
+Delete demo8 (project created by Atomist) because only 2 commits and the description is generic
+Delete demo9 (project created by Atomist) because the description is generic
+Delete redemption (project created by Atomist) because the description is generic
+Delete test (project created by Atomist) because only 2 commits and the description is generic
+Delete may-this-be-love (project created by Atomist) because only 2 commits and the description is generic
+Delete popcorn (project created by Atomist) because only 2 commits and the description is generic
+Delete demo10 (project created by Atomist) because the description is generic
+Delete holt (project created by Atomist) because the description is generic
+Delete gorton (project created by Atomist) because the description is generic
+Delete tonight (my new project) because the description is generic
+Delete artist (my new project) because the description is generic
+Delete rr1 (my new project) because only 2 commits and the description is generic
+Delete rr2 (my new project) because the description is generic
+Delete mendehlsson (my new project) because the description is generic
+Delete dragonfoot (my new project) because only 2 commits and the description is generic
+Delete dashboard-service (my new project) because only 2 commits and the description is generic
+Delete sylvain-test1 (my new project) because only 2 commits and the description is generic
+Delete arctic (arctic) because only 1 commits and the description is the same as the name
+Delete bondi (bondi) because only 1 commits and the description is the same as the name
+Delete cairo (cairo) because only 1 commits and the description is the same as the name
