@@ -2,8 +2,6 @@ import * as fs from "fs";
 import { promisify } from "util";
 import { gatherMyRepositoryNames, gatherCommitCount } from "../src/githubCalls";
 
-console.log("Hello");
-
 const config: Promise<DeletionCriteria> = readConfig();
 
 const data: Promise<RepoData[]> = gatherData();
